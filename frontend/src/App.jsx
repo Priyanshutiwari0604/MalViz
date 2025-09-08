@@ -1,38 +1,65 @@
+// App.jsx (Fixed Theme Implementation)
 import React, { useState, useEffect } from "react";
-import { Shield } from "lucide-react";
+import { Shield, Cpu, Activity, Database, Terminal } from "lucide-react";
 import UploadPanel from "./components/UploadPanel";
 import Dashboard from "./components/Dashboard";
 import ThemeToggle from "./components/ThemeToggle";
+import StatsPanel from "./components/StatsPanel";
+import "./App.css";
 
 function App() {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState(() => {
+    // Get theme from localStorage or default to 'dark'
+    return localStorage.getItem("theme") || "dark";
+  });
+  const [stats, setStats] = useState({
+    totalFiles: 0,
+    analyzedFiles: 0,
+    detectedThreats: 0,
+    lastAnalysis: null
+  });
 
   useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    // Apply theme class to document element
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const handleFileUploaded = () => {
-    // Refresh the dashboard or handle the uploaded file
+    // Refresh the dashboard
     window.location.reload();
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="app-container" data-theme={theme}>
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Malware Analyzer
+      <header className="app-header">
+        <div className="header-container">
+          <div className="flex items-center gap-3">
+            <div className="header-logo">
+              <Terminal className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="app-title">
+                MALVIZ
               </h1>
+              <p className="app-subtitle">Dynamic Malware Analyzer</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4 feature-tags">
+              <div className="flex items-center gap-1">
+                <Database className="w-4 h-4" />
+                <span>Static Analysis</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Activity className="w-4 h-4" />
+                <span>Behavioral Engine</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Cpu className="w-4 h-4" />
+                <span>AI Detection</span>
+              </div>
             </div>
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
@@ -40,10 +67,18 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <UploadPanel onUploaded={handleFileUploaded} />
-        <Dashboard />
+      <main className="main-content">
+        <StatsPanel stats={stats} theme={theme} />
+        <UploadPanel onUploaded={handleFileUploaded} theme={theme} />
+        <Dashboard onStatsUpdate={setStats} theme={theme} />
       </main>
+
+      {/* Footer */}
+      <footer className="app-footer">
+        <div className="footer-content">
+          <p>MALVIZ - Dynamic Malware Analysis Platform | For Research and Educational Purposes Only</p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,5 +1,6 @@
+// UploadPanel.jsx (Redesigned)
 import React, { useState } from "react";
-import { Upload, Shield, RefreshCw } from "lucide-react";
+import { Upload, Shield, RefreshCw, AlertTriangle, Terminal } from "lucide-react";
 import api from "../api";
 
 export default function UploadPanel({ onUploaded }) {
@@ -7,8 +8,15 @@ export default function UploadPanel({ onUploaded }) {
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleFile = (selectedFile) => {
+    setError(null);
+    // Basic file type validation
+    if (selectedFile.size > 100 * 1024 * 1024) { // 100MB limit
+      setError("File size exceeds 100MB limit");
+      return;
+    }
     setFile(selectedFile);
   };
 
@@ -37,6 +45,7 @@ export default function UploadPanel({ onUploaded }) {
 
     try {
       setLoading(true);
+      setError(null);
       const res = await api.post("/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) =>
@@ -48,48 +57,56 @@ export default function UploadPanel({ onUploaded }) {
       onUploaded(res.data.file);
     } catch (err) {
       console.error(err);
-      alert("❌ Upload failed: " + (err.response?.data?.error || err.message));
+      setError(err.response?.data?.error || err.message || "Upload failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-        <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+    <div className="bg-kali-gray-800 rounded-xl border border-kali-purple shadow-lg p-6 mb-8 relative overflow-hidden">
+      <div className="matrix-bg"></div>
+      <h2 className="text-xl font-semibold text-kali-neonblue mb-4 flex items-center gap-2 relative z-10 font-mono">
+        <Terminal className="w-5 h-5 text-kali-neonblue" />
         Upload File for Analysis
       </h2>
       
+      {error && (
+        <div className="mb-4 p-3 bg-kali-gray-700 border border-kali-neonred rounded-lg flex items-center gap-2 text-kali-neonred relative z-10 font-mono pulse-alert">
+          <AlertTriangle className="w-4 h-4" />
+          {error}
+        </div>
+      )}
+      
       <div
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 relative z-10 ${
           dragOver 
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" 
-            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+            ? "border-kali-neonblue bg-kali-gray-700 glow-blue" 
+            : "border-kali-purple hover:border-kali-neonblue"
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
         <div className="flex flex-col items-center gap-4">
-          <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">
-            <Upload className="w-8 h-8 text-gray-600 dark:text-gray-300" />
+          <div className="p-3 bg-kali-gray-700 rounded-full border border-kali-purple">
+            <Upload className="w-8 h-8 text-kali-neonblue" />
           </div>
           
           {file ? (
             <div className="text-center">
-              <p className="font-medium text-gray-900 dark:text-white">{file.name}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="font-medium text-kali-neonblue font-mono">{file.name}</p>
+              <p className="text-sm text-kali-gray-400 font-mono">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
             </div>
           ) : (
             <div>
-              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <p className="text-lg font-medium text-white mb-2 font-mono">
                 Drop your file here or click to browse
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Supports executables, archives, and suspicious files
+              <p className="text-sm text-kali-gray-400 font-mono">
+                Supports executables, documents, scripts, and other suspicious files (Max 100MB)
               </p>
             </div>
           )}
@@ -102,7 +119,7 @@ export default function UploadPanel({ onUploaded }) {
           />
           <label
             htmlFor="file-upload"
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors duration-200"
+            className="px-6 py-2 bg-kali-purple hover:bg-kali-neonblue text-white rounded-lg cursor-pointer transition-colors duration-200 font-mono"
           >
             Choose File
           </label>
@@ -110,12 +127,12 @@ export default function UploadPanel({ onUploaded }) {
       </div>
 
       {file && (
-        <div className="mt-6 flex items-center gap-4">
+        <div className="mt-6 flex items-center gap-4 relative z-10">
           <button
             onClick={upload}
             disabled={loading}
-            className="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white rounded-lg 
-                     transition-colors duration-200 flex items-center gap-2"
+            className="px-6 py-2 bg-kali-neonred hover:bg-red-700 disabled:bg-kali-gray-600 text-white rounded-lg 
+                     transition-colors duration-200 flex items-center gap-2 font-mono glow-red"
           >
             {loading ? (
               <>
@@ -131,9 +148,9 @@ export default function UploadPanel({ onUploaded }) {
           </button>
           
           {loading && (
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="flex-1 bg-kali-gray-700 rounded-full h-2 overflow-hidden">
               <div 
-                className="bg-red-600 h-2 rounded-full transition-all duration-200"
+                className="bg-kali-neonred h-2 rounded-full transition-all duration-200 glow-red"
                 style={{ width: `${progress}%` }}
               />
             </div>

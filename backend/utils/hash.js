@@ -1,11 +1,35 @@
 import crypto from "crypto";
-import fs from "fs/promises";
+import { createReadStream } from "fs";
 
-export const generateSHA256 = async (filePath) => {
-  try {
-    const fileBuffer = await fs.readFile(filePath);
-    return crypto.createHash("sha256").update(fileBuffer).digest("hex");
-  } catch (error) {
-    throw new Error(`Failed to generate hash: ${error.message}`);
-  }
+/**
+ * Generate SHA-256 hash of a file.
+ * @param {string} filePath - Path to the file.
+ * @returns {Promise<string>} - SHA-256 hash in hex format.
+ */
+export const generateSHA256 = (filePath) => {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash("sha256");
+
+    let stream;
+    try {
+      stream = createReadStream(filePath);
+    } catch (err) {
+      return reject(new Error(`Failed to open file: ${err.message}`));
+    }
+
+    stream.on("error", (err) => {
+      reject(new Error(`Failed to read file: ${err.message}`));
+    });
+
+    stream.on("data", (chunk) => hash.update(chunk));
+
+    stream.on("end", () => {
+      try {
+        const digest = hash.digest("hex");
+        resolve(digest);
+      } catch (err) {
+        reject(new Error(`Hash finalization failed: ${err.message}`));
+      }
+    });
+  });
 };
