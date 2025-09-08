@@ -11,6 +11,11 @@ It provides APIs to handle file uploads, generate file hashes, and store metadat
 - **RESTful API**: Routes ready for connecting with frontend for full-stack functionality.
 - **Modular Structure**: Organized controllers, routes, models, and middleware for easy extension.
 
+## How Data stored in database 
+<img width="826" height="226" alt="image" src="https://github.com/user-attachments/assets/ac4df26d-2c15-4b9a-8d19-f89d2039bc56" />
+<img width="1443" height="952" alt="image" src="https://github.com/user-attachments/assets/0f577944-83c7-47c3-a727-c5b0ae839a3b" />
+
+
 ## Folder Structure
 ```bash
 backend/
