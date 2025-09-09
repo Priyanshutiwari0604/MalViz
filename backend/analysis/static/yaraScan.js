@@ -40,7 +40,6 @@
 //   }
 // }
 
-
 // import { spawnSync } from "child_process";
 // import fs from "fs";
 
@@ -93,9 +92,12 @@ rule Windows_PE {
   // Collect rule files if directory given
   let ruleFiles = [];
   if (fs.statSync(rulePath).isDirectory()) {
-    ruleFiles = fs.readdirSync(rulePath)
-      .filter(f => f.endsWith(".yar") || f.endsWith(".yara") || f.endsWith(".rule"))
-      .map(f => path.join(rulePath, f));
+    ruleFiles = fs
+      .readdirSync(rulePath)
+      .filter(
+        (f) => f.endsWith(".yar") || f.endsWith(".yara") || f.endsWith(".rule")
+      )
+      .map((f) => path.join(rulePath, f));
   } else {
     ruleFiles = [rulePath];
   }
@@ -108,13 +110,20 @@ rule Windows_PE {
   // Choose YARA executable
   const yaraExecutables = [
     process.env.YARA_PATH, // ✅ allow override
-    "yara", "yara64", "yara.exe", "yara64.exe"
+    "yara",
+    "yara64",
+    "yara.exe",
+    "yara64.exe",
   ].filter(Boolean);
 
   let yaraExe = null;
   for (const exe of yaraExecutables) {
     try {
-      const testResult = spawnSync(exe, ["--version"], { shell: true, stdio: "pipe", timeout: 3000 });
+      const testResult = spawnSync(exe, ["--version"], {
+        shell: true,
+        stdio: "pipe",
+        timeout: 3000,
+      });
       if (testResult.status === 0) {
         yaraExe = exe;
         if (isDev) console.log(`✅ Found YARA executable: ${exe}`);
@@ -132,21 +141,32 @@ rule Windows_PE {
 
   // Run scan
   try {
-    const args = ["-r", ...ruleFiles, filePath];
+    const args = ["-r", ...ruleFiles, `"${filePath}"`];
     if (isDev) console.log(`🔍 Running: ${yaraExe} ${args.join(" ")}`);
 
-    const result = spawnSync(yaraExe, args, { encoding: "utf8", shell: true, timeout: 30000 });
+    const result = spawnSync(yaraExe, args, {
+      encoding: "utf8",
+      shell: true,
+      timeout: 30000,
+    });
 
     if (result.error) throw result.error;
     if (result.stderr) console.error("YARA stderr:", result.stderr.trim());
 
     const matches = (result.stdout || "")
       .split("\n")
-      .map(line => line.trim())
-      .filter(Boolean);
-
+      .map((line) => {
+        const match = line.trim().split(/\s+/);
+        return match[0]; // Return just the rule name
+      })
+      .filter(Boolean)
+      .filter((rule, index, arr) => arr.indexOf(rule) === index); // Remove duplicates
     if (isDev) {
-      console.log(matches.length ? `✅ Found ${matches.length} YARA matches` : "ℹ️ No YARA matches");
+      console.log(
+        matches.length
+          ? `✅ Found ${matches.length} YARA matches`
+          : "ℹ️ No YARA matches"
+      );
     }
 
     return matches;
