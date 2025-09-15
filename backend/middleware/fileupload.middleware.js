@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
 
-// Ensure storage directory exists
 const storageDir = path.join(process.cwd(), "storage");
 if (!fs.existsSync(storageDir)) {
   fs.mkdirSync(storageDir, { recursive: true });
@@ -23,6 +22,6 @@ const storage = multer.diskStorage({
 export const upload = multer({ 
   storage,
   limits: {
-    fileSize: 1000 * 1024 * 1024, // 10MB limit
+    fileSize: 1000 * 1024 * 1024,
   }
 });

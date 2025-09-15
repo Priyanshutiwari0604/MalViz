@@ -1,25 +1,3 @@
-// import mongoose from "mongoose";
-
-// const fileSchema = new mongoose.Schema(
-//   {
-//     originalName: { type: String, required: true }, // user-provided name
-//     safeName: { type: String, required: true },     // stored filename on disk
-//     size: { type: Number, required: true },         // file size in bytes
-//     hash: { type: String, required: true, unique: true, index: true }, // SHA-256 hash
-//     mimetype: { type: String, required: true },     // MIME type (image/png, etc.)
-//     uploadedAt: { type: Date, default: Date.now },  // timestamp
-//     uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // single uploader
-//     staticAnalysis: {entropy: Number,strings: [String],iocs: [String],yaraMatches: [String],peMetadata: Object,},
-//   },
-//   { timestamps: true } // adds createdAt & updatedAt automatically
-// );
-
-// // ✅ Compound index for better deduplication checks
-// fileSchema.index({ hash: 1, uploadedBy: 1 }, { unique: true });
-
-// export default mongoose.model("File", fileSchema);
-
-
 import mongoose from "mongoose";
 
 const fileSchema = new mongoose.Schema(
@@ -32,10 +10,10 @@ const fileSchema = new mongoose.Schema(
     uploadedAt: { type: Date, default: Date.now },
     uploadedBy: { type: String, default: "demo-user" },
 
-    status: { 
-      type: String, 
-      enum: ["uploaded", "analyzing", "completed", "failed"], 
-      default: "uploaded" 
+    status: {
+      type: String,
+      enum: ["uploaded", "analyzing", "completed", "failed"],
+      default: "uploaded",
     },
 
     staticAnalysis: {
@@ -45,10 +23,19 @@ const fileSchema = new mongoose.Schema(
       yaraMatches: [{ type: String }],
       peMetadata: { type: mongoose.Schema.Types.Mixed, default: null },
       analysisDate: { type: Date, default: null },
-      errors: [{ type: String }]
-    }
+      errors: [{ type: String }],
+    },
+    threatIntel: {
+      vtReport: { type: mongoose.Schema.Types.Mixed, default: null },
+      vtScore: { type: Number, default: null }, // malicious/total engines
+      vtDetections: [{ type: String }], // engine names that flagged it
+      abuseCHMatches: [{ type: String }],
+      otxMatches: [{ type: String }],
+      analysisDate: { type: Date, default: null },
+      errors: [{ type: String }],
+    },
   },
-  { 
+  {
     timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
@@ -57,12 +44,11 @@ const fileSchema = new mongoose.Schema(
           ret.staticAnalysis.stringsCount = doc.staticAnalysis.strings.length;
         }
         return ret;
-      }
-    }
+      },  
+    },
   }
 );
 
-// Indexes
 fileSchema.index({ hash: 1, uploadedBy: 1 }, { unique: true });
 fileSchema.index({ uploadedAt: -1 });
 fileSchema.index({ "staticAnalysis.analysisDate": -1 });

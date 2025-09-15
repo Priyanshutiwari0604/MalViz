@@ -1,11 +1,6 @@
 import crypto from "crypto";
 import { createReadStream } from "fs";
 
-/**
- * Generate SHA-256 hash of a file.
- * @param {string} filePath - Path to the file.
- * @returns {Promise<string>} - SHA-256 hash in hex format.
- */
 export const generateSHA256 = (filePath) => {
   return new Promise((resolve, reject) => {
     const hash = crypto.createHash("sha256");
