@@ -53,7 +53,6 @@ app.get("/api/health", (req, res) => {
 app.use("/api", fileRoutes);
 app.use("/api", analyzeRoutes);
 app.use("/api/intel", intelRoutes);
-
 const clientBuildPath = path.join(__dirname, "../client/dist");
 const hasClientBuild = fs.existsSync(clientBuildPath);
 
