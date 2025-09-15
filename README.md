@@ -29,17 +29,12 @@
 * Lookup indicators in AlienVault OTX.
 * Dashboard displays threat scores and matches.
 
-### Phase 4 – Dynamic Analysis (Optional)
+### Phase 4 – Dynamic Analysis (Future enhancemnet with Malviz)
 
 * Integrate with Cuckoo Sandbox or similar sandbox environment.
 * Record malware behavior including processes, network activity, and dropped files.
 * Dashboard provides a timeline view of dynamic behavior.
 
-### Phase 5 – Reporting
-
-* Automatically generate SOC-style PDF reports using Puppeteer or PDFKit.
-* Reports include file metadata, static analysis results, threat intelligence, dynamic sandbox results, and final verdict.
-* Downloadable directly from the dashboard.
 
 ---
 
@@ -75,8 +70,7 @@ MalViz/
 │   │   │   └── otx.js
 │   │   └── dynamic/
 │   │       └── cuckoo.js
-│   └── reports/
-│       └── reportGenerator.js
+│   
 └── storage/               
 ```
 
@@ -89,7 +83,6 @@ MalViz/
 * **Static Analysis:** Shannon entropy, strings extraction, YARA scanning, PE parsing
 * **Threat Intelligence:** VirusTotal API, Abuse.ch, AlienVault OTX
 * **Dynamic Analysis:** Cuckoo Sandbox
-* **Reporting:** Puppeteer or PDFKit
 
 ---
 
@@ -101,8 +94,6 @@ MalViz/
 | 2     | Malware reverse engineering     | Entropy, strings, YARA, PE parsing |
 | 3     | Threat intelligence integration | VirusTotal, Abuse.ch, OTX lookups  |
 | 4     | Advanced malware analysis       | Sandbox + behavior logging         |
-| 5     | Reporting                       | Auto PDF reports                   |
-
 
 
 ---
@@ -147,17 +138,6 @@ MalViz/
 3. Backend polls sandbox for results (process tree, network IOCs, dropped files).
 4. Timeline view on dashboard visualizes malware behavior.
 
-### Phase 5 – Reporting
-
-1. Click "Download Report" for any analyzed file.
-2. Backend generates a PDF report with:
-
-   * File metadata
-   * Static analysis results
-   * Threat intelligence results
-   * Dynamic analysis (if available)
-   * Final verdict (benign/malicious)
-3. Download and share SOC-style report.
 
 ---
 

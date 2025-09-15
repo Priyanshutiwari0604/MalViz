@@ -68,6 +68,37 @@ backend/
 └── script.js
 
 ```
+
+## Folder Structure for phase 3 
+
+```bash
+├── backend/
+│   ├── analysis/
+│   │   ├── static/
+│   │   │   ├── entropy.js
+│   │   │   ├── strings.js
+│   │   │   ├── yaraScan.js
+│   │   │   └── peParser.js
+│   │   └── threatIntel/
+│   │       ├── virusTotal.js
+│   │       ├── abuseCh.js
+│   │       └── otx.js
+│   ├── controllers/
+│   │   └── fileController.js
+│   ├── db/
+│   │   └── database.js
+│   ├── middleware/
+│   │   └── fileUpload.js
+│   ├── models/
+│   │   └── File.js
+│   ├── routes/
+│   │   └── fileRoutes.js
+│   ├── utils/
+│   │   └── hash.js
+│   └── server.js
+
+```
+
 ---
 ### Static Analysis
 1. **Hashes**
@@ -102,6 +133,44 @@ backend/
      - Embedded resources (icons, menus, strings).
      - Relocation information and security features (digital signatures, DEP).
    - Helps identify malicious behavior and extract embedded payloads.
+
+---
+## Dynamic Analysis
+
+Dynamic analysis doesn’t stop at collecting runtime behaviors — the extracted **IOCs** (domains, IPs, file hashes, registry keys, dropped binaries) are cross-checked against external **threat intelligence feeds** for deeper insights.
+
+### VirusTotal Integration
+After dynamic execution, hashes of dropped files and contacted URLs are sent to **VirusTotal**.  
+
+**VirusTotal provides:**
+- Detection ratio from multiple AV engines  
+- Known malicious classifications (e.g., *Trojan / Spyware / Backdoor*)  
+- Related samples seen in the wild  
+
+---
+
+### Abuse.ch Feeds
+IPs and domains observed during execution are matched against **Abuse.ch blocklists** (e.g., *URLHaus, MalwareBazaar, Feodo Tracker*).  
+
+This quickly confirms whether a runtime contact point is already a **known malware C2 (Command & Control) server**.  
+
+---
+
+### AlienVault OTX (Open Threat Exchange)
+Extracted indicators (IP, domain, hash) are queried against **OTX pulses**.  
+
+**OTX provides:**
+- Related malware families  
+- Campaign associations (e.g., *Emotet, Trickbot, Ransomware strains*)  
+- Threat actor TTPs (MITRE ATT&CK mappings)  
+
+---
+
+### Why This Matters
+- **Static analysis** only tells you what a file *might* do.  
+- **Dynamic analysis** shows what it *actually did*.  
+- **Threat intelligence enrichment** confirms if those observed behaviors are already linked to **known malware campaigns**, giving much stronger attribution and confidence.  
+nfidence.
 
 ---
 ## Getting Started
