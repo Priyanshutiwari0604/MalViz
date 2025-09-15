@@ -1,6 +1,6 @@
-// App.jsx (Redesigned with Professional Cybersecurity Theme)
+// App.jsx - Professional Cybersecurity Application Shell
 import React, { useState, useEffect } from "react";
-import { Shield, Cpu, Activity, Database, Terminal, Lock, Eye, Bug } from "lucide-react";
+import { Shield, Cpu, Activity, Database, Terminal, Lock, AlertTriangle, BarChart3 } from "lucide-react";
 import UploadPanel from "./components/UploadPanel";
 import Dashboard from "./components/Dashboard";
 import ThemeToggle from "./components/ThemeToggle";
@@ -11,6 +11,7 @@ function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || "dark";
   });
+  
   const [stats, setStats] = useState({
     totalFiles: 0,
     analyzedFiles: 0,
@@ -18,82 +19,92 @@ function App() {
     lastAnalysis: null
   });
 
+  const [activeView, setActiveView] = useState("dashboard");
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
+    
+    // Apply theme class to body for better CSS targeting
+    document.body.className = theme === "dark" ? "dark-theme" : "light-theme";
   }, [theme]);
 
   const handleFileUploaded = () => {
+    // Trigger refresh of dashboard which will update stats
     window.location.reload();
+  };
+
+  const handleStatsUpdate = (newStats) => {
+    setStats(newStats);
   };
 
   return (
     <div className="app-container" data-theme={theme}>
-      {/* Matrix background effect for dark theme */}
-      {theme === "dark" && (
-        <div className="matrix-background">
-          {[...Array(50)].map((_, i) => (
-            <div key={i} className="matrix-digit" style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 10}s`
-            }}>
-              {Math.round(Math.random())}
-            </div>
-          ))}
-        </div>
-      )}
-      
-      {/* Header */}
+      {/* Professional Header */}
       <header className="app-header">
         <div className="header-container">
-          <div className="flex items-center gap-3">
-            <div className="header-logo pulse-glow">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="app-title tracking-tight">
-                MAL<span className="text-security-blue">VIZ</span>
-              </h1>
-              <p className="app-subtitle">Advanced Malware Analysis Platform</p>
+          {/* Logo and Branding */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="app-title">
+                  MAL<span className="text-blue-400">VIZ</span>
+                </h1>
+                <p className="app-subtitle">Advanced Malware Analysis Platform</p>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-4 feature-tags">
-              <div className="flex items-center gap-1 px-2 py-1 bg-security-tag rounded">
-                <Database className="w-3 h-3" />
-                <span className="text-xs">Static Analysis</span>
-              </div>
-              <div className="flex items-center gap-1 px-2 py-1 bg-security-tag rounded">
-                <Activity className="w-3 h-3" />
-                <span className="text-xs">Behavioral Engine</span>
-              </div>
-              <div className="flex items-center gap-1 px-2 py-1 bg-security-tag rounded">
-                <Cpu className="w-3 h-3" />
-                <span className="text-xs">AI Detection</span>
-              </div>
-            </div>
+
+          {/* Feature Tags and Controls */}
+          <div className="flex items-center gap-6">
+            {/* Theme Toggle */}
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main className="main-content">
+        {/* Statistics Dashboard */}
         <StatsPanel stats={stats} theme={theme} />
+
+        {/* File Upload Section */}
         <UploadPanel onUploaded={handleFileUploaded} theme={theme} />
-        <Dashboard onStatsUpdate={setStats} theme={theme} />
+
+        {/* File Management Dashboard */}
+        <Dashboard onStatsUpdate={handleStatsUpdate} theme={theme} />
       </main>
 
-      {/* Footer */}
+      {/* Professional Footer */}
       <footer className="app-footer">
-        <div className="footer-content">
+        <div className="footer-container">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="flex items-center gap-1 text-xs">
-              <Lock className="w-3 h-3" />
-              MALVIZ - Secure Malware Analysis Platform
-            </p>
-            <p className="text-xs opacity-70">For Research and Educational Purposes Only</p>
+            <div className="flex items-center gap-2 text-sm text-secondary">
+              <Lock className="w-4 h-4" />
+              <span>MALVIZ - Professional Malware Analysis Platform</span>
+            </div>
+            <div className="flex items-center gap-6 mt-4 md:mt-0 text-sm text-secondary">
+              <span>For Research and Educational Purposes Only</span>
+              <div className="flex items-center gap-2">
+                <Terminal className="w-4 h-4" />
+                <span>Secure Analysis Environment</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Additional Footer Info */}
+          <div className="footer-info">
+            <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-secondary">
+              <div>
+                <span>Powered by VirusTotal API • YARA Rules • Static Analysis Engine</span>
+              </div>
+              <div className="mt-2 sm:mt-0">
+                <span>© 2025 MALVIZ. Built for cybersecurity professionals.</span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
