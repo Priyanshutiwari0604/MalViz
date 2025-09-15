@@ -1,12 +1,4 @@
 
-rule Test_Always_Match {
-    meta:
-        description = "Test rule that matches any file"
-        author = "Test"
-    condition:
-        filesize > 0
-}
-
 rule Windows_PE {
     meta:
         description = "Windows PE executable"
