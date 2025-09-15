@@ -29,7 +29,7 @@
 * Lookup indicators in AlienVault OTX.
 * Dashboard displays threat scores and matches.
 
-### Phase 4 – Dynamic Analysis (Optional)
+### Phase 4 – Dynamic Analysis (Future enhancemnet with Malviz)
 
 * Integrate with Cuckoo Sandbox or similar sandbox environment.
 * Record malware behavior including processes, network activity, and dropped files.
